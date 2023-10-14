@@ -86,8 +86,9 @@ public class List2a<T> extends ListSecondary<T> {
         this.preStart = new Node();
         this.preStart.next = null;
         this.postFinish = new Node();
-        postFinish = this.preStart;
+        this.postFinish.next = null;
         this.lastLeft = this.preStart;
+        this.lastLeft.next = this.postFinish;
         this.leftLength = 0;
         this.rightLength = 0;
     }
@@ -141,9 +142,7 @@ public class List2a<T> extends ListSecondary<T> {
         p.data = x;
         p.next = q.next;
         q.next = p;
-        if (this.rightLength == 0) {
-            this.postFinish = p;
-        }
+
         this.rightLength++;
     }
 
@@ -154,9 +153,7 @@ public class List2a<T> extends ListSecondary<T> {
         Node q = p.next;
         p.next = q.next;
         T x = q.data;
-        if (this.rightLength == 1) {
-            this.postFinish = this.lastLeft;
-        }
+
         this.rightLength--;
         return x;
     }
@@ -189,13 +186,13 @@ public class List2a<T> extends ListSecondary<T> {
 
     @Override
     public final Iterator<T> iterator() {
-        return new List2Iterator();
+        return new List2aIterator();
     }
 
     /**
      * Implementation of {@code Iterator} interface for {@code List2}.
      */
-    private final class List2Iterator implements Iterator<T> {
+    private final class List2aIterator implements Iterator<T> {
 
         /**
          * Current node in the linked list.
@@ -205,13 +202,13 @@ public class List2a<T> extends ListSecondary<T> {
         /**
          * No-argument constructor.
          */
-        private List2Iterator() {
+        private List2aIterator() {
             this.current = List2a.this.preStart.next;
         }
 
         @Override
         public boolean hasNext() {
-            return this.current != null;
+            return (!this.current.equals(List2a.this.postFinish));
         }
 
         @Override
@@ -232,7 +229,8 @@ public class List2a<T> extends ListSecondary<T> {
 
         @Override
         public void remove() {
-            throw new UnsupportedOperationException("remove operation not supported");
+            throw new UnsupportedOperationException(
+                    "remove operation not supported");
         }
 
     }
@@ -243,7 +241,10 @@ public class List2a<T> extends ListSecondary<T> {
 
     @Override
     public final void moveToFinish() {
-        this.lastLeft = this.postFinish;
+
+        while (!this.lastLeft.next.equals(this.postFinish)) {
+            this.advance();
+        }
         this.leftLength += this.rightLength;
         this.rightLength = 0;
     }
